@@ -46,7 +46,7 @@
             </router-link>
           </q-item-section>
         </q-item>
-        <q-item
+        <!-- <q-item
           clickable
         >
           <q-item-section avatar>
@@ -57,7 +57,7 @@
               <q-item-label>About</q-item-label>
             </router-link>
           </q-item-section>
-        </q-item>
+        </q-item> -->
          <q-item
           clickable
         >
@@ -70,7 +70,7 @@
             </router-link>
           </q-item-section>
         </q-item>
-         <q-item
+         <!-- <q-item
           clickable
         >
           <q-item-section avatar>
@@ -81,7 +81,7 @@
               <q-item-label>Task</q-item-label>
             </router-link>
           </q-item-section>
-        </q-item>
+        </q-item> -->
          <q-item
           clickable
         >
