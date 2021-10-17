@@ -314,6 +314,7 @@ export default class Home extends Vue {
       phone: this.phone,
       city: this.city,
     });
+    this.small = false;
     this.q.notify({
       position: "top",
       message: "New user added successfully...",
@@ -348,6 +349,7 @@ export default class Home extends Vue {
     this.phone = data.phone;
     this.city = data.city;
     this.showUpdateBtn = true;
+    this.small = true;
   }
 
   updateList() {
