@@ -1,174 +1,312 @@
 <template>
-  <div class="q-pa-md">
-    <h4>Fields</h4>
-    <!-- <draggable v-model="items">
-      <template v-slot:item="{ item }">
-        <div>
-          {{ item.title }}
+  <div class="q-px-md q-pt-md">
+    <div class="row no-wrap justify-around flex-center">
+      <div
+        v-mutation="handler1"
+        @dragenter="onDragEnter"
+        @dragleave="onDragLeave"
+        @dragover="onDragOver"
+        @drop="onDrop"
+        class="drop-target rounded-borders overflow-hidden scroll q-pa-sm"
+        id="firstBox"
+      >
+        <template v-for="item in tableData" :key="item.id">
+          <p
+            draggable="true"
+            @dragstart="onDragStart"
+            @click="dragClick"
+            :id="item.id"
+            class="q-pa-xs"
+          >
+            {{ item.value }}
+          </p>
+        </template>
+      </div>
+      <div>
+        <div class="text-center">
+        <button @click="Add">&gt;&gt;</button>
+        <p>Add to report field</p>
         </div>
-      </template>
-    </draggable> -->
-    <!--  -->
-    <div class="flex items-center">
+        <div class="text-center">
+        <button @click="remove">&lt;&lt;</button>
+        <p>Remove from report field</p>
+        </div>
+      </div>
+
       <div
-        class="drop-zone"
-        @drop.prevent="onDrop($event, 1)"
-        @dragenter.prevent
-        @dragover.prevent
+        v-mutation="handler2"
+        @dragenter="onDragEnter"
+        @dragleave="onDragLeave"
+        @dragover="onDragOver"
+        @drop="onDrop"
+        class="drop-target rounded-borders overflow-hidden scroll q-pa-sm"
+        id="lastBox"
       >
-        <ul>
-          <li
-          :class="{active: isActive}"
-            v-for="(item,index) in option"
-            :key="index"
+        <template v-for="item in tableDataTwo" :key="item.id">
+          <p
             draggable="true"
-            @dragstart="startDrag($event, item)"
-            @click="selectedItem(item, index)"
+            @dragstart="onDragStart"
+            @click="dragClick"
+            :id="item.id"
+            class="q-pa-xs"
           >
-            {{ item.title }}
-          </li>
-        </ul>
+            {{ item.value }}
+          </p>
+        </template>
       </div>
-      <div class="q-mx-xl text-center">
-         <q-btn @click="AddSelectItem" color="primary" icon="keyboard_double_arrow_right" label="Add Fields" /> <br />
-         <q-btn @click="RemoveSelectItem" class="q-mt-md" color="primary" icon="keyboard_double_arrow_left" label="Remove Field" />
-      </div>
-      <div
-        class="drop-zone"
-        @drop.prevent="onDrop($event, 2)"
-        @dragenter.prevent
-        @dragover.prevent
-      >
-        <ul>
-          <li
-            v-for="(item,index) in option1"
-            :key="index"
-            @dragstart="startDrag($event, item)"
-            draggable="true"
-            @click="selectedLeftItem(item, index)"
-          >
-            {{ item?.title }}
-          </li>
-        </ul>
-      </div>
+    </div>
+    <div class="q-mt-lg">
+      firstBox {{ firstBox }} <br />
+      <br />
+      lastBox {{ lastBox }}
     </div>
   </div>
 </template>
+
 <script>
-import { ref, onMounted, computed } from "vue";
-// import Draggable from "vue3-draggable";
-
-export default {
-  name: "Fields",
-  components: {
-    // Draggable,
+import { ref } from "vue";
+const tableData = [
+  {
+    id: 1,
+    value: "item1",
   },
+  {
+    id: 2,
+    value: "item2",
+  },
+  {
+    id: 3,
+    value: "item3",
+  },
+  {
+    id: 4,
+    value: "item4",
+  },
+  {
+    id: 5,
+    value: "item5",
+  },
+  {
+    id: 6,
+    value: "item6",
+  },
+];
 
+const tableDataTwo = [
+  {
+    id: 7,
+    value: "item7",
+  },
+  {
+    id: 8,
+    value: "item8",
+  },
+  {
+    id: 9,
+    value: "item9",
+  },
+  {
+    id: 10,
+    value: "item10",
+  },
+  {
+    id: 11,
+    value: "item11",
+  },
+  {
+    id: 12,
+    value: "item12",
+  },
+];
+import { onMounted } from "vue";
+export default {
   setup() {
-    const isActive = ref(false)
-    const option = ref([
-      { id: 0, title: "Google", list: 1 },
-      { id: 1, title: "Facebook", list: 1 },
-      { id: 2, title: "Twitter", list: 1 },
-      { id: 3, title: "Apple", list: 2 },
-      { id: 4, title: "Insta", list: 1 },
-    ]);
-
-    const option1 = ref([
-      { id: 4, title: "abc", list: 2 },
-    ]);
-
-    const selectValue = ref([]);
-    const selectedIndex = ref("")
-    const selectLeftValue = ref([]);
-    const selectedleftIndex = ref("")
+    const status1 = ref([]);
+    const status2 = ref([]);
+    const parentId = ref("");
+    const child = ref(null);
+    const firstBox = ref([]);
+    const lastBox = ref([]);
 
     onMounted(() => {
-      console.log("call mounted");
+      firstBox.value.push(...tableData);
+      lastBox.value.push(...tableDataTwo);
     });
-    const menusList = computed(() => console.log("call computed method"));
-
-    // const getList = (list) => {
-    //   return option.value.filter((item) => item.list == list);
-    // };
-
-    const startDrag = (event, item) => {
-      console.log("drag event", item);
-      event.dataTransfer.dropEffect = "move";
-      event.dataTransfer.effectAllowed = "move";
-      event.dataTransfer.setData("itemID", item.id);
-    };
-
-    const onDrop = (event, list) => {
-      const itemID = event.dataTransfer.getData("itemID");
-      const item = option.value.find((item) => item.id == itemID);
-      console.log("list", list);
-      console.log("item drop", item);
-      // option.value = list
-      option.value.splice(itemID,1)
-      option1.value.push(item)
-    };
-
-    const selectedItem = (data, idx) => {
-      selectValue.value = data;
-      selectedIndex.value = idx
-    };
-
-    const AddSelectItem = () => {
-      option1.value.push(selectValue.value)
-      option.value.splice(selectedIndex.value, 1)
-    };
-
-    const selectedLeftItem = (data, idx) => {
-      console.log("idx", idx);
-      selectedleftIndex.value = idx
-      selectLeftValue.value = data
-    }
-
-    const RemoveSelectItem = () => {
-      option.value.push(selectLeftValue.value)
-      option1.value.splice(selectedleftIndex.value, 1)
-    }
 
     return {
-      // items,
-      option,
-      menusList,
-      startDrag,
-      onDrop,
-      // getList,
-      selectedItem,
-      AddSelectItem,
-      selectValue,
-      option1,
-      isActive,
-      RemoveSelectItem,
-      selectedIndex,
-      selectedLeftItem,
-      selectLeftValue,
-      selectedleftIndex
+      status1,
+      status2,
+      tableData,
+      tableDataTwo,
+      firstBox,
+      lastBox,
+
+      handler1(mutationRecords) {
+        firstBox.value = [];
+        const first = document.getElementById("firstBox").children;
+        for (let i = 0; i < first.length; i++) {
+          firstBox.value.push({
+            id: Number(first[i].id),
+            value: first[i].innerHTML,
+          });
+        }
+
+        status1.value = [];
+        for (const index in mutationRecords) {
+          const record = mutationRecords[index];
+          const info = `type: ${record.type}, nodes added: ${
+            record.addedNodes.length > 0 ? "true" : "false"
+          }, nodes removed: ${
+            record.removedNodes.length > 0 ? "true" : "false"
+          }, oldValue: ${record.oldValue}`;
+          status1.value.push(info);
+        }
+      },
+
+      handler2(mutationRecords) {
+        lastBox.value = [];
+        const first = document.getElementById("lastBox").children;
+        for (let i = 0; i < first.length; i++) {
+          lastBox.value.push({
+            id: Number(first[i].id),
+            value: first[i].innerHTML,
+          });
+        }
+
+        status2.value = [];
+        for (const index in mutationRecords) {
+          const record = mutationRecords[index];
+          const info = `type: ${record.type}, nodes added: ${
+            record.addedNodes.length > 0 ? "true" : "false"
+          }, nodes removed: ${
+            record.removedNodes.length > 0 ? "true" : "false"
+          }, oldValue: ${record.oldValue}`;
+          status2.value.push(info);
+        }
+      },
+
+      // store the id of the draggable element
+      onDragStart(e) {
+        e.dataTransfer.setData("text", e.target.id);
+        e.dataTransfer.dropEffect = "move";
+      },
+
+      Add() {
+        if (parentId.value === "firstBox") {
+          child.value.parentNode.removeChild(child.value);
+          const lastBox = document.getElementById("lastBox");
+          lastBox.appendChild(child.value);
+          child.value.classList.remove("red");
+        }
+      },
+      remove() {
+        if (parentId.value === "lastBox") {
+          child.value.parentNode.removeChild(child.value);
+          const lastBox = document.getElementById("firstBox");
+          lastBox.appendChild(child.value);
+          child.value.classList.remove("red");
+        }
+      },
+
+      dragClick(e) {
+        if (child.value !== null) {
+          child.value.classList.remove("red");
+        }
+        parentId.value = "";
+        child.value = null;
+        parentId.value = e.target.parentNode.id;
+        child.value = document.getElementById(e.target.id);
+        child.value.classList.add("red");
+      },
+
+      onDragEnter(e) {
+        // don't drop on other draggables
+        if (e.target.draggable !== true) {
+          e.target.classList.add("drag-enter");
+        }
+      },
+
+      onDragLeave(e) {
+        e.target.classList.remove("drag-enter");
+      },
+
+      onDragOver(e) {
+        e.preventDefault();
+      },
+
+      onDrop(e) {
+        e.preventDefault();
+
+        // don't drop on other draggables
+        if (e.target.draggable === true) {
+          return;
+        }
+
+        const draggedId = e.dataTransfer.getData("text");
+        const draggedEl = document.getElementById(draggedId);
+
+        // check if original parent node
+        if (draggedEl.parentNode === e.target) {
+          e.target.classList.remove("drag-enter");
+          return;
+        }
+
+        // make the exchange
+        draggedEl.parentNode.removeChild(draggedEl);
+        e.target.appendChild(draggedEl);
+        e.target.classList.remove("drag-enter");
+      },
     };
   },
 };
 </script>
-<style scoped>
-.multi-select {
-  width: 200px;
-}
-.drop-zone {
-  width: 180px;
-  height: 200px;
-  border: 1px solid black;
-  overflow-y: scroll;
-}
-ul {
-  list-style: none;
-  padding-left: 10px;
-}
-.active {
-  background: lightblue;
-}
-ul li:hover {
-  background: lightblue;
-}
+
+<style scoped lang="sass">
+.drop-target
+  background-color:#fff !important
+  border:1px solid #d5cfcf
+.scroll
+  overflow-y: scroll !important
+  height:200px !important
+
+.drop-target
+  height: 400px
+  width: 200px
+  min-width: 200px
+  background-color: gainsboro
+
+.drag-enter
+  outline-style: dashed
+
+.box
+  width: 100px
+  height: 100px
+  float: left
+  cursor: pointer
+
+@media only screen and (max-width: 500px)
+  .drop-target
+    height: 200px
+    width: 100px
+    min-width: 100px
+    background-color: gainsboro
+
+  .box
+    width: 50px
+    height: 50px
+
+.box:nth-child(3)
+  clear: both
+
+.navy
+  background-color: navy
+
+.red
+  background-color: firebrick
+
+.green
+  background-color: darkgreen
+
+.orange
+  background-color: orange
 </style>
